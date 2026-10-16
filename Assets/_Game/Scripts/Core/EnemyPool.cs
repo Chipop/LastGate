@@ -4,10 +4,10 @@ using UnityEngine;
 public class EnemyPool : MonoBehaviour
 {
     [SerializeField] private Enemy enemyPrefab;
-    Stack<Enemy> free;
-    List<Enemy> live;
+    private Stack<Enemy> free;
+    private List<Enemy> live;
     // For the mage to read it and target the live enemies
-    public IReadOnlyList<Enemy> Live => (IReadOnlyList<Enemy>)live;
+    public IReadOnlyList<Enemy> Live => live;
 
     private float prewarm = 60;
 
