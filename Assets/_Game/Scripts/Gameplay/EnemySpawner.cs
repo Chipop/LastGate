@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    SerializeField] private LevelData level1;
+    [SerializeField] private LevelData level1;
     [SerializeField] private Gate gate;
     [SerializeField] private EnemyPool enemyPool;
     [SerializeField] private Enemy enemyPrefab;
