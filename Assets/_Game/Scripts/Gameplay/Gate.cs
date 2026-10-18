@@ -37,7 +37,7 @@ public class Gate : MonoBehaviour
             }
         );
 
-        Debug.Log($"Gate {Hp}/{MaxHp}");
+        //Debug.Log($"Gate {Hp}/{MaxHp}");
         Analytics.Track("gate_damaged", new() { ["hpAfter"] = Hp });
         if (Hp == 0) OnDestroyed?.Invoke();
     }
