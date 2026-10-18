@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MageStats
   damage: 10
   fireRate: 1
-  cooldown: 1
   projectileSpeed: 8
   projectiles: 1
   pierce: 0

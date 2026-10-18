@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   id: brute
   hp: 200
+  attackDamage: 30
+  attackInterval: 1.5
   speed: 0.7
   size: 0.9
-  gateDamage: 200
   xp: 40
   gemsMin: 1
   gemsMax: 2

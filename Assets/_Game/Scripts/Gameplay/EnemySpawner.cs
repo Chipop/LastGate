@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    [SerializeField] private Gate gate;
     [SerializeField] private EnemyPool enemyPool;
     [SerializeField] private Enemy enemyPrefab;
     [SerializeField] private EnemyData enemyData;
@@ -16,7 +17,6 @@ public class EnemySpawner : MonoBehaviour
     // Custom methods
     public void Spawn(EnemyData d, int level)
     {
-
         float randomX = Random.Range(spawnXMin, spawnXMax);
         Vector2 spawnPos = new Vector2(randomX, spawnY);
 
@@ -25,8 +25,9 @@ public class EnemySpawner : MonoBehaviour
         float speed = d.speed * (Mathf.Min(1.5f, 1f + 0.03f * (level - 1)));
 
         Enemy enemy = enemyPool.Get();
-        enemy.Init(spawnPos, hp, speed, enemyData.gateDamage, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
+        enemy.Init(spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
 
+        gate.Watch(enemy);
     }
 
     private IEnumerator SpawnRoutine()

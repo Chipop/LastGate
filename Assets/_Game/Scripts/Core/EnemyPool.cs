@@ -12,7 +12,7 @@ public class EnemyPool : MonoBehaviour
     private float prewarm = 60;
 
     // Custom methods
-    private void E_OnReachedGate(Enemy e)
+    private void E_OnDied(Enemy e)
     {
         e.gameObject.SetActive(false);
         Release(e);
@@ -22,8 +22,8 @@ public class EnemyPool : MonoBehaviour
     {
         Enemy e = Instantiate(enemyPrefab, Vector3.zero, Quaternion.identity);
         e.gameObject.SetActive(false);
-        e.OnReachedGate += E_OnReachedGate;
-        e.OnDied += E_OnReachedGate;
+        //e.OnReachedGate += E_OnReachedGate;
+        e.OnDied += E_OnDied;
         return e;
     }
 

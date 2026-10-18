@@ -7,23 +7,26 @@ public class Enemy : MonoBehaviour
     private float wobbleSeed;
     private float hp;
     private float speed;
-    private float gateDamage;
-    private float xp;
+    private float attackDamage;
+    private float attackInterval;
+    private float attackCooldown = 0f;
+    private int xp;
     private float gateLineY;
     public event Action<Enemy> OnReachedGate;
     public event Action<Enemy> OnDied;
+    public struct AttackParams { public float attackDamage; }
+    public event Action<AttackParams> OnAttack;
 
     public float Xp => xp;
-    public float GateDamage => gateDamage;
-
 
     // Custom Methods
-    public void Init(Vector2 spawnPos, float hp, float speed, int gateDamage, int xp, float size, Color tint, float gateLineY)
+    public void Init(Vector2 spawnPos, float hp, float speed, float attackDamage, float attackInterval , int xp, float size, Color tint, float gateLineY)
     {
         this.transform.position = spawnPos;
         this.hp = hp;
         this.speed = speed;
-        this.gateDamage = gateDamage;
+        this.attackDamage = attackDamage;
+        this.attackInterval = attackInterval;
         this.xp = xp;
         this.gateLineY = gateLineY;
 
@@ -34,12 +37,19 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (hp <= 0f) return;
+
         this.hp -= amount;
         if (hp <= 0)
         {
             OnDied?.Invoke(this);
             this.gameObject.SetActive(false);
         }
+    }
+
+    private void Attack()
+    {
+        OnAttack?.Invoke(new AttackParams { attackDamage = this.attackDamage });
     }
 
     // Unity LifeCycle
@@ -51,18 +61,29 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (transform.position.y <= gateLineY)
+        {
+            attackCooldown -= Time.deltaTime;
+            if (attackCooldown <= 0)
+            {
+                Attack();
+                attackCooldown = attackInterval;
+            }
+            return; // Do not advance
+        }
+
         float wobble = Mathf.Sin((Time.time + wobbleSeed) * 2f * Mathf.PI * 2f) * 0.15f;
 
         //transform.position += Vector3.down * speed * Time.deltaTime;
         transform.position += new Vector3(wobble * Time.deltaTime, -speed * Time.deltaTime, 0f);
 
         // Arrived at gate, then we make it disapear
-        if (transform.position.y  <= gateLineY)
-        {
-            OnReachedGate?.Invoke(this);
-            //gameObject.SetActive(false);
-            //Destroy(gameObject);
-        }
+        //if (transform.position.y  <= gateLineY)
+        //{
+        //    OnReachedGate?.Invoke(this);
+        //    //gameObject.SetActive(false);
+        //    //Destroy(gameObject);
+        //}
     }
 
 }

@@ -70,7 +70,6 @@ public class MageController : MonoBehaviour
     
         if (nearestEnemy != null)
         {
-            Debug.Log(nearestEnemy);
             FireProjectile(nearestEnemy);
         }
     }
