@@ -843,7 +843,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e7c93f4cfe138d4284cc48994040887, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  level1: {fileID: 11400000, guid: f0f4d74103e62884bb7df36c6b93bffe, type: 2}
+  authoredLevels:
+  - {fileID: 11400000, guid: f0f4d74103e62884bb7df36c6b93bffe, type: 2}
+  - {fileID: 11400000, guid: f0f4d74103e62884bb7df36c6b93bffe, type: 2}
+  - {fileID: 11400000, guid: f0f4d74103e62884bb7df36c6b93bffe, type: 2}
   gate: {fileID: 1131339922}
   enemyPool: {fileID: 1020539238}
   enemyPrefab: {fileID: 3051913952685827660, guid: b0e110e5fbd975541a42b585c811fd1e, type: 3}

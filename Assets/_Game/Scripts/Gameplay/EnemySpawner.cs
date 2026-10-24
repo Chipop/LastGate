@@ -1,10 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private LevelData level1;
+    [SerializeField] private List<LevelData> authoredLevels;
     [SerializeField] private Gate gate;
     [SerializeField] private EnemyPool enemyPool;
     [SerializeField] private Enemy enemyPrefab;
@@ -20,12 +21,22 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float waveTimeout = 25f;
     [SerializeField] private float restBetweenLevels = 3f;
 
-    private int level = 1;
+    public int Level { get; private set; } = 1;
+    public int Wave {  get; private set; }
+
+    public struct OnWaveStartedArgs {
+        public int level;
+        public int wave;
+    }
+    public event Action<OnWaveStartedArgs> OnWaveStarted;
+    public event Action OnWaveCleared;
+    public event Action<Enemy> OnEnemyKilled;
+    private void Killed(Enemy e) => OnEnemyKilled?.Invoke(e);
 
     // Custom methods
     public void Spawn(EnemyData enemyData, int level)
     {
-        float randomX = Random.Range(spawnXMin, spawnXMax);
+        float randomX = UnityEngine.Random.Range(spawnXMin, spawnXMax);
         Vector2 spawnPos = new Vector2(randomX, spawnY);
 
         // hp multiplier depending on the level
@@ -33,9 +44,11 @@ public class EnemySpawner : MonoBehaviour
         float speed = enemyData.speed * (Mathf.Min(1.5f, 1f + 0.03f * (level - 1)));
 
         Enemy enemy = enemyPool.Get();
-        enemy.Init(spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
+        enemy.Init(enemyData.id, spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
 
         gate.Watch(enemy);
+        enemy.OnDied -= Killed;
+        enemy.OnDied += Killed;
     }
 
     private IEnumerator SpawnGroupRoutine(SpawnGroup group)
@@ -43,7 +56,7 @@ public class EnemySpawner : MonoBehaviour
         yield return new WaitForSeconds(group.startsAfter);
         for (int i = 0; i < group.count; i++)
         {
-            Spawn(group.enemy, 1);
+            Spawn(group.enemy, Level);
             yield return new WaitForSeconds(group.interval);
         }
     }
@@ -51,6 +64,14 @@ public class EnemySpawner : MonoBehaviour
     private IEnumerator RunWaveRoutine(List<SpawnGroup> spawnGroups)
     {
         List<Coroutine> corroutines = new List<Coroutine>();
+
+        OnWaveStarted?.Invoke(
+            new OnWaveStartedArgs
+            {
+                level = Level,
+                wave = Wave
+            }
+        );
 
         foreach (var group in spawnGroups)
         {
@@ -69,13 +90,36 @@ public class EnemySpawner : MonoBehaviour
             waveTimer += Time.deltaTime;
             yield return null;
         }
-        Debug.Log("wave cleared");
+
+        OnWaveCleared?.Invoke();
     }
 
-    private IEnumerator RunLevel1(){
+    private IEnumerator RunLevels()
+    {
 
-        foreach (var wave in level1.waves)
+        while (true) // Endless generation
         {
+            if (Level > authoredLevels.Count)
+            {
+                Wave = 0;
+                yield return RunWaves(EndlessGenerator.Build(Level, walker, runner, brute));
+                Level++;
+            }
+
+            foreach (var level in authoredLevels)
+            {
+                Wave = 0;
+                yield return RunWaves(level.waves);
+                Level++;
+            }
+        }
+    }
+
+    private IEnumerator RunWaves(List<WaveData> waves)
+    {
+        foreach (var wave in waves)
+        {
+            Wave++;
             yield return RunWaveRoutine(wave.groups);
         }
         while (enemyPool.Live.Count > 0)
@@ -85,10 +129,9 @@ public class EnemySpawner : MonoBehaviour
         yield return new WaitForSeconds(restBetweenLevels);
     }
 
-    //Unity Life cycle
-    private void Start()
+    public void Begin()
     {
-        StartCoroutine(RunLevel1());
-        Debug.Log("Fun");
+        StartCoroutine(RunLevels());
     }
+
 }

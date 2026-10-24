@@ -4,6 +4,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer sr;
+    public string Id { get; private set; }
     private float wobbleSeed;
     private float hp;
     private float speed;
@@ -20,8 +21,9 @@ public class Enemy : MonoBehaviour
     public float Xp => xp;
 
     // Custom Methods
-    public void Init(Vector2 spawnPos, float hp, float speed, float attackDamage, float attackInterval , int xp, float size, Color tint, float gateLineY)
+    public void Init(string id, Vector2 spawnPos, float hp, float speed, float attackDamage, float attackInterval , int xp, float size, Color tint, float gateLineY)
     {
+        this.Id = id;
         this.transform.position = spawnPos;
         this.hp = hp;
         this.speed = speed;

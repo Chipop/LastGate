@@ -20,11 +20,8 @@ public class GameManager : MonoBehaviour
     {
         Analytics.Track("run_start");
         gate.OnDestroyed += GameOver;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        spawner.Begin();
+        spawner.OnWaveStarted += args => Debug.Log($"Level {args.level} wave {args.wave}");
+        spawner.OnEnemyKilled += enemy => Debug.Log($"Killed enemy: {enemy.Id}");
     }
 }
