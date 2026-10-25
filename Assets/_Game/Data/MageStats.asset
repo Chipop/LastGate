@@ -15,5 +15,5 @@ MonoBehaviour:
   damage: 10
   fireRate: 1
   projectileSpeed: 18
-  projectiles: 3
+  projectiles: 1
   pierce: 0

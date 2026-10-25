@@ -29,6 +29,7 @@ public class EnemySpawner : MonoBehaviour
         public int wave;
     }
     public event Action<OnWaveStartedArgs> OnWaveStarted;
+    public event Action OnLevelCleared;
     public event Action OnWaveCleared;
     public event Action<Enemy> OnEnemyKilled;
     private void Killed(Enemy e) => OnEnemyKilled?.Invoke(e);
@@ -44,7 +45,7 @@ public class EnemySpawner : MonoBehaviour
         float speed = enemyData.speed * (Mathf.Min(1.5f, 1f + 0.03f * (level - 1)));
 
         Enemy enemy = enemyPool.Get();
-        enemy.Init(enemyData.id, spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
+        enemy.Init(enemyData, spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
 
         gate.Watch(enemy);
         enemy.OnDied -= Killed;
@@ -83,7 +84,6 @@ public class EnemySpawner : MonoBehaviour
             yield return courroutineHandle;
         }
 
-        Debug.Log("wave spawned");
         float waveTimer = 0;
         while (enemyPool.Live.Count >= waveAliveThreshold && waveTimer < waveTimeout)
         {
@@ -96,22 +96,15 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator RunLevels()
     {
-
-        while (true) // Endless generation
+        while (true)
         {
-            if (Level > authoredLevels.Count)
-            {
-                Wave = 0;
-                yield return RunWaves(EndlessGenerator.Build(Level, walker, runner, brute));
-                Level++;
-            }
+            List<WaveData> waves = Level <= authoredLevels.Count
+                ? authoredLevels[Level - 1].waves
+                : EndlessGenerator.Build(Level, walker, runner, brute);
 
-            foreach (var level in authoredLevels)
-            {
-                Wave = 0;
-                yield return RunWaves(level.waves);
-                Level++;
-            }
+            Wave = 0;
+            yield return RunWaves(waves);
+            Level++;
         }
     }
 
@@ -126,6 +119,7 @@ public class EnemySpawner : MonoBehaviour
         {
             yield return null;
         }
+        OnLevelCleared?.Invoke();
         yield return new WaitForSeconds(restBetweenLevels);
     }
 

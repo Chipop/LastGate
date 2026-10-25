@@ -42,7 +42,7 @@ public class Gate : MonoBehaviour
         if (Hp == 0) OnDestroyed?.Invoke();
     }
 
-    private void Heal(int points)
+    public void Heal(int points)
     {
         Hp = Mathf.Min(MaxHp, Hp + points);
         OnHpChanged?.Invoke(
@@ -54,7 +54,7 @@ public class Gate : MonoBehaviour
         );
     }
 
-    private void IncreaseMaxHealth(int points)
+    public void IncreaseMaxHealth(int points)
     {
         MaxHp += points;
         Heal(points);

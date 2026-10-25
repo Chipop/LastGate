@@ -7,17 +7,14 @@ public class MageController : MonoBehaviour
     [SerializeField] private ProjectilePool projectilePool;
     [SerializeField] private Projectile projectilePrefab;
     [SerializeField] private Transform muzzle;
-    private float fireRate;
-    private float cooldown = 1f;
-    private float damage;
-    private float projectileSpeed;
-    private int projectiles;
-    private int pierce;
-
-    public float Damage => damage;
-    public float FireRate => fireRate;
-    public float Projectiles => projectiles;
-    public int Pierce => pierce;
+    public float FireRate { get; set; }
+    public float Cooldown { get; set; } = 1f;
+    public float ProjectileSpeed { get; set; }
+    public float Damage { get; set; }
+    public float Projectiles { get; set; }
+    public int Pierce { get; set; }
+    public int ChainLevel { get; set; }
+    public int FrostLevel { get; set; }
 
     // Custom Methods
     private Enemy GetNearestEnemy()
@@ -40,12 +37,12 @@ public class MageController : MonoBehaviour
     private void FireProjectile(Enemy nearestEnemy)
     {
         Vector3 direction = (nearestEnemy.transform.position - muzzle.position).normalized;
-        for (int i = 0; i < projectiles; i++)
+        for (int i = 0; i < Projectiles; i++)
         {
-            float angle = (i - (projectiles - 1) / 2f) * 8f;        // centred fan: -8, 0, +8 for projectiles = 3
+            float angle = (i - (Projectiles - 1) / 2f) * 8f;        // centred fan: -8, 0, +8 for projectiles = 3
             Vector2 d = Quaternion.Euler(0, 0, angle) * direction;
             Projectile p = projectilePool.Get();
-            p.Fire(muzzle.position, d, projectileSpeed, Damage, Pierce);
+            p.Fire(muzzle.position, d, ProjectileSpeed, Damage, Pierce);
         }
     }
 
@@ -53,20 +50,20 @@ public class MageController : MonoBehaviour
 
     private void Awake()
     {
-        damage = baseStats.damage;
-        fireRate = baseStats.fireRate;
-        projectileSpeed = baseStats.projectileSpeed;
-        projectiles = baseStats.projectiles;
-        pierce = baseStats.pierce;
+        Damage = baseStats.damage;
+        FireRate = baseStats.fireRate;
+        ProjectileSpeed = baseStats.projectileSpeed;
+        Projectiles = baseStats.projectiles;
+        Pierce = baseStats.pierce;
     }
 
     private void Update()
     {
-        cooldown -= Time.deltaTime;
+        Cooldown -= Time.deltaTime;
         Enemy nearestEnemy = GetNearestEnemy();
-        if (cooldown > 0 || nearestEnemy == null) return;
+        if (Cooldown > 0 || nearestEnemy == null) return;
 
-        cooldown = 1f / fireRate;
+        Cooldown = 1f / FireRate;
     
         if (nearestEnemy != null)
         {
