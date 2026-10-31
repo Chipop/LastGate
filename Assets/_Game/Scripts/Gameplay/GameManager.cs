@@ -1,8 +1,27 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public enum GameState { Title, Running, LevelUp, Paused, GameOver }
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] GameObject pausePanel;
+    [SerializeField] Button resumeButton;
+    [SerializeField] Button restartButton;
+    [SerializeField] Button quitToTitleButton;
+    private float desiredSpeed = 1f;
+    private GameState state = GameState.Title;
+    public bool IsGameOver => state == GameState.GameOver;
+
+    [SerializeField] GameObject titlePanel;
+    [SerializeField] TMP_Text bestScoreTMP;
+
+    [SerializeField] private GameOverUI gameOverUI;
+
     [SerializeField] Gate gate;
     [SerializeField] EnemySpawner spawner;
     [SerializeField] BonusService bonusService;
@@ -14,12 +33,41 @@ public class GameManager : MonoBehaviour
     private int pendingLevelUps;
     private int freeRerolls;
     private int paidRerolls;
-    private bool choosing;
     private readonly RunStats stats = new();
 
-    public bool IsGameOver { get; private set; }
     // 10 for the first paid reroll, then +5 for each further one in the same panel
     private int RerollCost => RerollBaseCost + RerollStep * paidRerolls;
+
+    private void setState(GameState newState)
+    {
+        state = newState;
+        ApplyTimeScale();
+        titlePanel.SetActive(state == GameState.Title);
+        pausePanel.SetActive(state == GameState.Paused);
+        Debug.Log($"Game State: {state}");
+    }
+
+    private void ApplyTimeScale()
+    {
+        switch (state)
+        {
+            case GameState.Title:
+                Time.timeScale = 0f;
+                break;
+            case GameState.Running:
+                Time.timeScale = desiredSpeed;
+                break;
+            case GameState.LevelUp:
+                Time.timeScale = 0f;
+                break;
+            case GameState.Paused:
+                Time.timeScale = 0f;
+                break;
+            case GameState.GameOver:
+                Time.timeScale = 0f;
+                break;
+        }
+    }
 
     // Custom Methods
     private void ShowCards()
@@ -33,8 +81,7 @@ public class GameManager : MonoBehaviour
 
     private void OpenLevelUp()
     {
-        choosing = true;
-        Time.timeScale = 0f;
+        setState(GameState.LevelUp);
         freeRerolls = 1; // one free reroll per panel
         paidRerolls = 0;
         ShowCards();
@@ -49,8 +96,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Time.timeScale = 1f;
-            choosing = false;
+            setState(GameState.Running);
             levelUpUI.Hide();
         }
     }
@@ -75,7 +121,7 @@ public class GameManager : MonoBehaviour
 
         stats.NotifyChanged();
 
-        if (pendingLevelUps > 0 && !choosing)
+        if (pendingLevelUps > 0 && state == GameState.Running)
         {
             OpenLevelUp();
         }
@@ -91,12 +137,42 @@ public class GameManager : MonoBehaviour
         stats.LevelsCleared++;
     }
 
+    private void Pause()
+    {
+        if(state != GameState.Running) return;
+        setState(GameState.Paused);
+    }
+
+    private void Resume()
+    {
+        if (state != GameState.Paused) return;
+        setState(GameState.Running);
+    }
+
+    private void ToggleSpeed()
+    {
+        desiredSpeed = desiredSpeed == 1f ? 2f : 1f;
+        ApplyTimeScale();
+        hudUI.SetSpeedLabel(Time.timeScale);
+    }
+
     private void GameOver()
     {
-        IsGameOver = true;
-        Time.timeScale = 0f;
+        setState(GameState.GameOver);
+        int best = PlayerPrefs.GetInt("best_score", 0);
+        if (stats.totalXp > best)
+        {
+            PlayerPrefs.SetInt("best_score", stats.totalXp);
+            PlayerPrefs.Save();
+        }
         Analytics.Track("run_end", new() { ["score"] = stats.totalXp, ["wavesCleared"] = stats.wavesCleared });
-        Debug.Log("Game Over");
+        
+        gameOverUI.Show(stats.totalXp, Mathf.Max(best, stats.totalXp), stats.totalXp > best, stats.playerLevel, stats.wavesCleared);
+    }
+
+    private void RestartRun()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // Handlers
@@ -143,6 +219,16 @@ public class GameManager : MonoBehaviour
         hudUI.SetGems(args.gems);
     }
 
+    
+    private void StartRun()
+    {
+        setState(GameState.Running);
+        Analytics.Track("run_start");
+
+        spawner.Begin();
+    }
+
+
     // Unity Lifecycle
     void Start()
     {
@@ -162,8 +248,24 @@ public class GameManager : MonoBehaviour
 
         stats.OnChanged += Stats_OnChanged;
 
-        Analytics.Track("run_start");
-        spawner.Begin();
+        gameOverUI.OnPlayAgainPressed += RestartRun;
+        gameOverUI.OnTitlePressed += RestartRun;
+        hudUI.OnPausePressed += Pause;
+        hudUI.OnSpeedPressed += ToggleSpeed;
+        resumeButton.onClick.AddListener(Resume);
+        restartButton.onClick.AddListener(RestartRun);
+        quitToTitleButton.onClick.AddListener(RestartRun);
+
+        bestScoreTMP.text = $"BEST {PlayerPrefs.GetInt("best_score", 0)}";
+    }
+
+    private void Update()
+    {
+        if (state != GameState.Title) return;
+        if(Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
+        {
+            StartRun();
+        }
     }
 
 }
