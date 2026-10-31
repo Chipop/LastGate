@@ -33,6 +33,8 @@ public class Enemy : MonoBehaviour
         this.attackInterval = attackInterval;
         this.xp = xp;
         this.gateLineY = gateLineY;
+        //reset cooldown for pooled enemies
+        this.attackCooldown = 0f;
 
         transform.localScale = Vector3.one * size;
         sr.color = tint;
@@ -81,13 +83,6 @@ public class Enemy : MonoBehaviour
         //transform.position += Vector3.down * speed * Time.deltaTime;
         transform.position += new Vector3(wobble * Time.deltaTime, -speed * Time.deltaTime, 0f);
 
-        // Arrived at gate, then we make it disapear
-        //if (transform.position.y  <= gateLineY)
-        //{
-        //    OnReachedGate?.Invoke(this);
-        //    //gameObject.SetActive(false);
-        //    //Destroy(gameObject);
-        //}
     }
 
 }

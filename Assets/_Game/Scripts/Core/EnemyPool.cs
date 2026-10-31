@@ -9,7 +9,7 @@ public class EnemyPool : MonoBehaviour
     // For the mage to read it and target the live enemies
     public IReadOnlyList<Enemy> Live => live;
 
-    private float prewarm = 60;
+    private int prewarm = 60;
 
     // Custom methods
     private void E_OnDied(Enemy e)
@@ -20,9 +20,8 @@ public class EnemyPool : MonoBehaviour
 
     private Enemy Make()
     {
-        Enemy e = Instantiate(enemyPrefab, Vector3.zero, Quaternion.identity);
+        Enemy e = Instantiate(enemyPrefab, Vector3.zero, Quaternion.identity, transform);
         e.gameObject.SetActive(false);
-        //e.OnReachedGate += E_OnReachedGate;
         e.OnDied += E_OnDied;
         return e;
     }

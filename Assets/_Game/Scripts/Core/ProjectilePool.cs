@@ -9,7 +9,7 @@ public class ProjectilePool : MonoBehaviour
 
     private Projectile Make()
     {
-        Projectile p = Instantiate(projectilePrefab, Vector2.zero, Quaternion.identity);
+        Projectile p = Instantiate(projectilePrefab, Vector2.zero, Quaternion.identity, transform);
         p.gameObject.SetActive(false);
         p.OnDone += P_OnDone;
         return p;

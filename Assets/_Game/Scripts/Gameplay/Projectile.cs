@@ -1,5 +1,4 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -19,7 +18,7 @@ public class Projectile : MonoBehaviour
         this.dir = direction;
         this.speed = speed;
         this.damage = damage;
-        this.hitsLeft += pierce;
+        this.hitsLeft = 1 + pierce;
         gameObject.SetActive(true);
     }
 

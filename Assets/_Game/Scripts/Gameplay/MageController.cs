@@ -11,7 +11,7 @@ public class MageController : MonoBehaviour
     public float Cooldown { get; set; } = 1f;
     public float ProjectileSpeed { get; set; }
     public float Damage { get; set; }
-    public float Projectiles { get; set; }
+    public int Projectiles { get; set; }
     public int Pierce { get; set; }
     public int ChainLevel { get; set; }
     public int FrostLevel { get; set; }
