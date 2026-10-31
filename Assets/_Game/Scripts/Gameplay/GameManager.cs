@@ -242,7 +242,7 @@ public class GameManager : MonoBehaviour
         levelUpUI.Hide();
 
         gate.OnHpChanged += Gate_OnHpChanged;
-        spawner.OnWaveStarted += Spawner_OnWaveStarted;     // replaces the Debug.Log lambda
+        spawner.OnWaveStarted += Spawner_OnWaveStarted;
         hudUI.SetGateHp(gate.Hp, gate.MaxHp);
         hudUI.SetLevelWave(1, 1);
 

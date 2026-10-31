@@ -15,7 +15,8 @@ public class Projectile : MonoBehaviour
     public void Fire(Vector2 from, Vector2 direction, float speed, float damage, int pierce)
     {
         transform.position = from;
-        this.dir = direction;
+        this.dir = direction.normalized;
+        transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
         this.speed = speed;
         this.damage = damage;
         this.hitsLeft = 1 + pierce;

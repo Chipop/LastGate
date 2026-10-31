@@ -20,6 +20,17 @@ public class Enemy : MonoBehaviour
     public event Action<AttackParams> OnAttack;
 
     public float Xp => xp;
+    public float Hp => hp;
+    public float GateLineY => gateLineY;
+    public bool IsAtGate => transform.position.y <= gateLineY;
+    public Vector2 Velocity
+    {
+        get
+        {
+            if(IsAtGate) return Vector2.zero;
+            return new Vector2(0, -speed);
+        }
+    }
 
     // Custom Methods
     public void Init(EnemyData data, Vector2 spawnPos, float hp, float speed, float attackDamage, float attackInterval , int xp, float size, Color tint, float gateLineY)
@@ -67,7 +78,7 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        if (transform.position.y <= gateLineY)
+        if (IsAtGate)
         {
             attackCooldown -= Time.deltaTime;
             if (attackCooldown <= 0)

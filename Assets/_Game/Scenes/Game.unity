@@ -8993,6 +8993,7 @@ GameObject:
   - component: {fileID: 2081979469}
   - component: {fileID: 2081979470}
   - component: {fileID: 2081979471}
+  - component: {fileID: 2081979472}
   m_Layer: 0
   m_Name: Mage
   m_TagString: Untagged
@@ -9089,10 +9090,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MageController
   baseStats: {fileID: 11400000, guid: 0bbc4c5cef84f1a4fa686c4984aa0d6f, type: 2}
+  targetSelector: {fileID: 2081979472}
   enemyPool: {fileID: 1020539238}
   projectilePool: {fileID: 1225204370}
-  projectilePrefab: {fileID: 4217152542200208123, guid: e13124fefe7bba140abfc972621d256d, type: 3}
   muzzle: {fileID: 1955177683}
+--- !u!114 &2081979472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2081979468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ef4f88f5b92eee4da3b9ab2071cef5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  enemyPool: {fileID: 1020539238}
+  muzzle: {fileID: 1955177683}
+  sameHeightTolerance: 0.5
 --- !u!1 &2101951362
 GameObject:
   m_ObjectHideFlags: 0
