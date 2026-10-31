@@ -16,20 +16,20 @@ MonoBehaviour:
   waves:
   - groups:
     - enemy: {fileID: 11400000, guid: 4b18fa57a4ecd6846aa6de7d56bf1349, type: 2}
-      count: 6
-      interval: 1.2
-      startDelay: 0
+      count: 5
+      interval: 2.4
+      startsAfter: 0
   - groups:
     - enemy: {fileID: 11400000, guid: 4b18fa57a4ecd6846aa6de7d56bf1349, type: 2}
-      count: 10
-      interval: 0.9
-      startDelay: 0
+      count: 7
+      interval: 2.1
+      startsAfter: 0
   - groups:
     - enemy: {fileID: 11400000, guid: 4b18fa57a4ecd6846aa6de7d56bf1349, type: 2}
-      count: 8
-      interval: 0.9
-      startDelay: 0
+      count: 7
+      interval: 1.9
+      startsAfter: 0
     - enemy: {fileID: 11400000, guid: f80523d14b1e1b0408af0eaed79013cd, type: 2}
-      count: 4
-      interval: 1.5
-      startDelay: 3
+      count: 3
+      interval: 3.2
+      startsAfter: 6

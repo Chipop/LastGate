@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a58ed8be43fbbc4ebba5016bf835559, type: 3}
+  m_Name: Level5
+  m_EditorClassIdentifier: Assembly-CSharp::LevelData
+  level: 5
+  waves:
+  - groups:
+    - enemy: {fileID: 11400000, guid: 10969b849b858f14f8315dc2c232b48e, type: 2}
+      count: 2
+      interval: 7
+      startsAfter: 0
+    - enemy: {fileID: 11400000, guid: 4b18fa57a4ecd6846aa6de7d56bf1349, type: 2}
+      count: 12
+      interval: 2
+      startsAfter: 14
+  - groups:
+    - enemy: {fileID: 11400000, guid: f80523d14b1e1b0408af0eaed79013cd, type: 2}
+      count: 16
+      interval: 1.4
+      startsAfter: 0
+    - enemy: {fileID: 11400000, guid: 4b18fa57a4ecd6846aa6de7d56bf1349, type: 2}
+      count: 10
+      interval: 2.2
+      startsAfter: 4
+  - groups:
+    - enemy: {fileID: 11400000, guid: 10969b849b858f14f8315dc2c232b48e, type: 2}
+      count: 1
+      interval: 1
+      startsAfter: 0
+    - enemy: {fileID: 11400000, guid: 4b18fa57a4ecd6846aa6de7d56bf1349, type: 2}
+      count: 16
+      interval: 1.6
+      startsAfter: 14
+    - enemy: {fileID: 11400000, guid: f80523d14b1e1b0408af0eaed79013cd, type: 2}
+      count: 10
+      interval: 2.2
+      startsAfter: 12
+    - enemy: {fileID: 11400000, guid: 10969b849b858f14f8315dc2c232b48e, type: 2}
+      count: 1
+      interval: 1
+      startsAfter: 22

@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] EnemySpawner spawner;
     [SerializeField] BonusService bonusService;
     [SerializeField] LevelUpUI levelUpUI;
+    [SerializeField] HudUI hudUI;
     private const int RerollBaseCost = 10;
     private const int RerollStep = 5;
     private List<BonusCard> drawedCards;
@@ -72,6 +73,8 @@ public class GameManager : MonoBehaviour
             Debug.Log("Level Up : " + stats.playerLevel);
         }
 
+        stats.NotifyChanged();
+
         if (pendingLevelUps > 0 && !choosing)
         {
             OpenLevelUp();
@@ -113,15 +116,31 @@ public class GameManager : MonoBehaviour
         else if (stats.gems >= RerollCost)
         {
             stats.gems -= RerollCost;
+            stats.NotifyChanged();
             paidRerolls++;
         }
         else
         {
-            return; // not free, not enough gems = button disabled
+            return; //  disnot free, not enough gems = buttonabled
         }
 
         Analytics.Track("reroll", new() { ["gemsAfter"] = stats.gems });
         ShowCards();
+    }
+
+    private void Gate_OnHpChanged(Gate.OnHpChangedEventArgs args)
+    {
+        hudUI.SetGateHp(args.hp, args.maxHp);
+    }
+
+    private void Spawner_OnWaveStarted(EnemySpawner.OnWaveStartedArgs args)
+    {
+        hudUI.SetLevelWave(args.level, args.wave);
+    }
+    private void Stats_OnChanged(RunStats.ChangedEventArgs args)
+    {
+        hudUI.SetXp(args.xp, args.xpNext);
+        hudUI.SetGems(args.gems);
     }
 
     // Unity Lifecycle
@@ -136,7 +155,15 @@ public class GameManager : MonoBehaviour
         levelUpUI.OnReroll += LevelUpUI_OnReroll;
         levelUpUI.Hide();
 
+        gate.OnHpChanged += Gate_OnHpChanged;
+        spawner.OnWaveStarted += Spawner_OnWaveStarted;     // replaces the Debug.Log lambda
+        hudUI.SetGateHp(gate.Hp, gate.MaxHp);
+        hudUI.SetLevelWave(1, 1);
+
+        stats.OnChanged += Stats_OnChanged;
+
         Analytics.Track("run_start");
         spawner.Begin();
     }
+
 }
