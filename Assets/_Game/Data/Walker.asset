@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88bedb253348c794d8091b6286ec1f38, type: 3}
   m_Name: Walker
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  frames:
+  - {fileID: 21300000, guid: a6ecb5435560e0a4a8a549ae40c76bd0, type: 3}
+  - {fileID: 21300000, guid: dbedc18f625beca4e9bce41447bd2fbf, type: 3}
+  - {fileID: 21300000, guid: 47a850286e0b35a4b9e8776302f20a5f, type: 3}
+  - {fileID: 21300000, guid: 61a7afb10b7750d4fbd2de7206794f3c, type: 3}
+  hitRadius: 0.45
+  deathColor: {r: 0, g: 1, b: 0.11642957, a: 1}
   id: walker
   hp: 30
   attackDamage: 10
@@ -21,4 +28,4 @@ MonoBehaviour:
   xp: 10
   gemsMin: 0
   gemsMax: 0
-  tint: {r: 0, g: 1, b: 0, a: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}

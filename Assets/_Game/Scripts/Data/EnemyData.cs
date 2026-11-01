@@ -3,6 +3,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyData", menuName = "Scriptable Objects/Enemy Data")]
 public class EnemyData : ScriptableObject
 {
+    public Sprite[] frames;
+    public float hitRadius = 0.5f;
+    public Color deathColor = Color.red;
+
     public string id = "walker";
     public float hp = 30f;
     public float attackDamage = 10f;

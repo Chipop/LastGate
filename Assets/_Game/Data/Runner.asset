@@ -12,12 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88bedb253348c794d8091b6286ec1f38, type: 3}
   m_Name: Runner
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  frames:
+  - {fileID: 21300000, guid: 76a34a0e4b7860e4dbc311dfc0d95826, type: 3}
+  - {fileID: 21300000, guid: cb469f9884ce30846bc2bac7e60d6c0c, type: 3}
+  - {fileID: 21300000, guid: 93c794dd849177f4eb94aad431b61b97, type: 3}
+  - {fileID: 21300000, guid: 3712e9064795cd3498c0219f27a182be, type: 3}
+  hitRadius: 0.35
+  deathColor: {r: 1, g: 0.95441294, b: 0, a: 1}
   id: runner
   hp: 12
+  attackDamage: 10
+  attackInterval: 1
   speed: 3
   size: 0.7
-  gateDamage: 25
   xp: 8
   gemsMin: 0
   gemsMax: 0
-  tint: {r: 1, g: 1, b: 0, a: 1}
+  tint: {r: 1, g: 1, b: 1, a: 1}

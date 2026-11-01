@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [SerializeField] private SpriteFlipbook flipbook;
+    [SerializeField] private CircleCollider2D hitCollider;
+
     [SerializeField] private SpriteRenderer sr;
     [SerializeField] private Color frostTint = new Color(0.5f, 0.8f, 1f);
     private Color baseTint;
@@ -56,7 +59,9 @@ public class Enemy : MonoBehaviour
         slowTimer = 0f;
         sr.color = tint;
 
-        transform.localScale = Vector3.one * size;
+        flipbook.SetFrames(data.frames);
+        hitCollider.radius = data.hitRadius;
+
         gameObject.SetActive(true);
     }
 

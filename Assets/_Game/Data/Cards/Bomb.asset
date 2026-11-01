@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afa0eed3fa63ee540a4d3063019c4e83, type: 3}
   m_Name: Bomb
   m_EditorClassIdentifier: Assembly-CSharp::BonusCard
-  id: bomb
-  cardName: Bomb
-  description: Every 4 s, a bomb blasts enemies in a radius
+  id: fireball
+  cardName: Fireball
+  description: Every 4 s a fireball blasts enemies in a radius
   icon: {fileID: 0}
   rarity: 2
   maxStack: 3
