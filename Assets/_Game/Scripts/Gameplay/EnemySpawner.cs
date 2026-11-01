@@ -46,7 +46,6 @@ public class EnemySpawner : MonoBehaviour
 
         Enemy enemy = enemyPool.Get();
         enemy.Init(enemyData, spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
-
         gate.Watch(enemy);
         enemy.OnDied -= Killed;
         enemy.OnDied += Killed;

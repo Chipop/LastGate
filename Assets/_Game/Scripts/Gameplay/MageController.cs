@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MageController : MonoBehaviour
 {
@@ -9,16 +10,32 @@ public class MageController : MonoBehaviour
     [SerializeField] private EnemyPool enemyPool;
     [SerializeField] private ProjectilePool projectilePool;
     [SerializeField] private Transform muzzle;
+    [SerializeField] private float[] frostSlowPerLevel = { 0f, 0.3f, 0.5f }; // index = Frost level
+    [SerializeField] private float frostSeconds = 2f;
     public float FireRate { get; set; }
     public float Cooldown { get; set; } = 1f;
     public float ProjectileSpeed { get; set; }
     public float Damage { get; set; }
     public int Projectiles { get; set; }
     public int Pierce { get; set; }
-    public int ChainLevel { get; set; }
+    public int BombLevel { get; set; }
     public int FrostLevel { get; set; }
 
     // Custom Methods
+
+    private Projectile.ShotParams BuildShot()
+    {
+        Projectile.ShotParams shot = new Projectile.ShotParams();
+        shot.damage = Damage;
+        shot.pierce = Pierce;
+        if (FrostLevel > 0)
+        {
+            int index = Mathf.Min(FrostLevel, frostSlowPerLevel.Length - 1);
+            shot.slowPercent = frostSlowPerLevel[index];
+            shot.slowSeconds = frostSeconds;
+        }
+        return shot;
+    }
 
     private Vector2 GetAimPoint(Enemy target)
     {
@@ -44,7 +61,7 @@ public class MageController : MonoBehaviour
         direction = Quaternion.Euler(0f, 0f, angleOffsetDegrees) * direction;
 
         Projectile projectile = projectilePool.Get();
-        projectile.Fire(muzzle.position, direction, ProjectileSpeed, Damage, Pierce);
+        projectile.Fire(muzzle.position, direction, ProjectileSpeed, BuildShot());
     }
 
     // Returns false when there was nobody to shoot at (so the cooldown is not spent).

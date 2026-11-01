@@ -6,7 +6,7 @@ public enum RarityEnum
 }
 public enum EffectEnum
 {
-    Damage, FireRate, SplitShot, Pierce, Reinforce, ChainLighting, Frost, Repair
+    Damage, FireRate, SplitShot, Pierce, Reinforce, Bomb, Frost, Repair
 }
 
 [CreateAssetMenu(fileName = "BonusCard", menuName = "Scriptable Objects/BonusCard")]

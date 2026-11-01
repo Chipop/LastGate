@@ -86,7 +86,7 @@ public class BonusService : MonoBehaviour
             case EffectEnum.Pierce: mage.Pierce += 1; break;
             case EffectEnum.Reinforce: gate.IncreaseMaxHealth(300); break;
             case EffectEnum.Repair: gate.Heal(Mathf.RoundToInt(gate.MaxHp * 0.4f)); break;
-            case EffectEnum.ChainLighting: mage.ChainLevel++; break;
+            case EffectEnum.Bomb: mage.BombLevel++; break;
             case EffectEnum.Frost: mage.FrostLevel++; break;
         }
     }

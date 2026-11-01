@@ -25,7 +25,7 @@ public class HudUI : MonoBehaviour
 
     public void SetGems(int gems)
     {
-        gemsText.text = gems.ToString();
+        gemsText.text = $"{gems} Gems";
     }
 
     public void SetXp(int xp, int xpNext)

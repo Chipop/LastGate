@@ -4,6 +4,11 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer sr;
+    [SerializeField] private Color frostTint = new Color(0.5f, 0.8f, 1f);
+    private Color baseTint;
+    // 1 = normal speed, 0.7 = 30 % slower 
+    private float slowMultiplier = 1f;
+    private float slowTimer;
     public string Id { get; private set; }
     public EnemyData Data { get; private set; }
     private float wobbleSeed;
@@ -28,7 +33,7 @@ public class Enemy : MonoBehaviour
         get
         {
             if(IsAtGate) return Vector2.zero;
-            return new Vector2(0, -speed);
+            return new Vector2(0, -speed * slowMultiplier);
         }
     }
 
@@ -46,9 +51,12 @@ public class Enemy : MonoBehaviour
         this.gateLineY = gateLineY;
         //reset cooldown for pooled enemies
         this.attackCooldown = 0f;
+        baseTint = tint;
+        slowMultiplier = 1f;
+        slowTimer = 0f;
+        sr.color = tint;
 
         transform.localScale = Vector3.one * size;
-        sr.color = tint;
         gameObject.SetActive(true);
     }
 
@@ -69,6 +77,15 @@ public class Enemy : MonoBehaviour
         OnAttack?.Invoke(new AttackParams { attackDamage = this.attackDamage });
     }
 
+    public void ApplySlow(float percent, float seconds)
+    {
+        float newMultiplier = 1f - percent;
+        // A stronger slow replaces a weaker one; the same slow just restarts the timer
+        slowMultiplier = slowTimer > 0f ? Mathf.Min(slowMultiplier, newMultiplier) : newMultiplier;
+        slowTimer = seconds;
+        sr.color = frostTint;
+    }
+
     // Unity LifeCycle
     private void Awake()
     {
@@ -78,9 +95,19 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (slowTimer > 0f)
+        {
+            slowTimer -= Time.deltaTime;
+            if (slowTimer <= 0f)
+            {
+                slowMultiplier = 1f;
+                sr.color = baseTint;
+            }
+        }
+
         if (IsAtGate)
         {
-            attackCooldown -= Time.deltaTime;
+            attackCooldown -= Time.deltaTime * slowMultiplier;
             if (attackCooldown <= 0)
             {
                 Attack();
@@ -92,7 +119,8 @@ public class Enemy : MonoBehaviour
         float wobble = Mathf.Sin((Time.time + wobbleSeed) * 2f * Mathf.PI * 2f) * 0.15f;
 
         //transform.position += Vector3.down * speed * Time.deltaTime;
-        transform.position += new Vector3(wobble * Time.deltaTime, -speed * Time.deltaTime, 0f);
+        float newSpeed = speed * slowMultiplier;
+        transform.position += new Vector3(wobble * Time.deltaTime, -newSpeed * Time.deltaTime, 0f);
 
     }
 
