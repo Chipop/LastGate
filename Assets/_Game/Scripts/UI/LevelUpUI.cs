@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -27,6 +28,9 @@ public class LevelUpUI : MonoBehaviour
         gameObject.SetActive(true);
         currentBonusCards = new List<BonusCard>(cards);
 
+        // a reroll or a second level-up reuses the panel
+        SetCardsInteractable(true);
+
         // Loop over the BUTTONS, not over the cards: the unused buttons must be hidden
         for (int i = 0; i < cardButtons.Length; i++)
         {
@@ -52,13 +56,41 @@ public class LevelUpUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // Runs while the game is paused (timeScale 0): everything here counts UNSCALED time
+    private IEnumerator PickRoutine(int index)
+    {
+        // a second click during the pop would pick twice
+        SetCardsInteractable(false);
+        Transform card = cardButtons[index].transform;
+
+        float elapsed = 0f;
+        const float seconds = 0.15f;
+        while (elapsed < seconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / seconds;
+            // grows then returns
+            card.localScale = Vector3.one * (1f + 0.15f * Mathf.Sin(t * Mathf.PI));
+            yield return null;
+        }
+        card.localScale = Vector3.one;
+
+        OnPicked?.Invoke(currentBonusCards[index]);
+    }
+
+    private void SetCardsInteractable(bool interactable)
+    {
+        foreach (Button button in cardButtons) button.interactable = interactable;
+    }
+
     // Unity Lifecycle
     private void Awake()
     {
         for (int i = 0; i < cardButtons.Length; i++)
         {
-            int index = i;                       // copy: each lambda needs its own index
-            cardButtons[i].onClick.AddListener(() => OnPicked?.Invoke(currentBonusCards[index]));
+            // copy: each lambda needs its own index
+            int index = i;
+            cardButtons[i].onClick.AddListener(() => StartCoroutine(PickRoutine(index)));
         }
         rerollButton.onClick.AddListener(() => OnReroll?.Invoke());
     }

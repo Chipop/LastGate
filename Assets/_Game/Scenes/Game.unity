@@ -2045,6 +2045,7 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
+  - component: {fileID: 1586133012}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2884,6 +2885,8 @@ Transform:
   - {fileID: 1225204369}
   - {fileID: 1355363090}
   - {fileID: 130729182}
+  - {fileID: 2103465311}
+  - {fileID: 1314674790}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &629670985
@@ -9590,6 +9593,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2101951362}
   m_CullTransparentMesh: 1
+--- !u!1 &2103465310
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2103465311}
+  - component: {fileID: 2103465312}
+  m_Layer: 0
+  m_Name: DeathFxPlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2103465311
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103465310}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 628888861}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2103465312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103465310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a42a0d5807b41444d8517183692b61d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  spawner: {fileID: 1685317119}
+  fxPrefab: {fileID: 9038455294584987312, guid: 27c5c4ee61af81640b16905cdec25466, type: 3}
 --- !u!1 &2146310885
 GameObject:
   m_ObjectHideFlags: 0
@@ -9691,3 +9740,67 @@ SceneRoots:
   - {fileID: 275850487}
   - {fileID: 2071742845}
   - {fileID: 2037572047}
+--- !u!114 &1586133012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2bf212cc3a2414eb8710a085c390ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &894596788
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1314674790}
+  - component: {fileID: 1092578593}
+  m_Layer: 0
+  m_Name: BombFeedback
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1314674790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894596788}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 628888861}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1092578593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894596788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d5ed6cca8c46798137f24d1c11e6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  launcher: {fileID: 2081979473}
+  gameManager: {fileID: 1355363091}
+  cameraShake: {fileID: 1586133012}
+  blastFxPrefab: {fileID: 9038455294584987312, guid: 371e9bde10d043bc86a3d64f4ecffb25, type: 3}
+  blastColor: {r: 1, g: 0.6, b: 0.2, a: 1}
+  shakeAmplitude: 0.25
+  shakeSeconds: 0.2
+  hitStopSeconds: 0.06

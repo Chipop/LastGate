@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     private int freeRerolls;
     private int paidRerolls;
     private readonly RunStats stats = new();
+    private Coroutine hitStop;
 
     // 10 for the first paid reroll, then +5 for each further one in the same panel
     private int RerollCost => RerollBaseCost + RerollStep * paidRerolls;
@@ -70,6 +72,22 @@ public class GameManager : MonoBehaviour
     }
 
     // Custom Methods
+    // Freeze the action for a few frames (fireball blast, brute kill). Only while Running: never freeze a menu.
+    public void HitStop(float seconds)
+    {
+        if (state != GameState.Running) return;
+        if (hitStop != null) StopCoroutine(hitStop);
+        hitStop = StartCoroutine(HitStopRoutine(seconds));
+    }
+
+    private IEnumerator HitStopRoutine(float seconds)
+    {
+        Time.timeScale = 0f;
+        yield return new WaitForSecondsRealtime(seconds);   // real time: scaled time is stopped
+        hitStop = null;
+        ApplyTimeScale();                                   // back to whatever the CURRENT state wants: x1, x2, or still paused
+    }
+
     private void ShowCards()
     {
         drawedCards = bonusService.Draw3Cards();

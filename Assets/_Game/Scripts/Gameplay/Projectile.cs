@@ -49,6 +49,7 @@ public class Projectile : MonoBehaviour
         {
             enemy.ApplySlow(shot.slowPercent, shot.slowSeconds);
         }
+        enemy.Flinch(dir);                       // feel only: never push an enemy with a bolt
         enemy.TakeDamage(shot.damage);
 
         if (--hitsLeft <= 0)

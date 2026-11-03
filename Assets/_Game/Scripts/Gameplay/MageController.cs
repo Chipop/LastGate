@@ -75,19 +75,16 @@ public class MageController : MonoBehaviour
         List<Enemy> targets = targetSelector.GetBestTargets(Projectiles);
         if (targets.Count == 0) return false;
 
+        // Bolt i goes to enemy i, round-robin. Bolts that share an enemy are fanned around it,
+        // otherwise they'd be fired from the same point in the same direction and draw as ONE bolt.
+        int targetCount = targets.Count;
         for (int i = 0; i < Projectiles; i++)
         {
-            if (targets.Count > 1)
-            {
-                // Several enemies: bolt i goes to enemy i (round-robin if there are more bolts than enemies)
-                FireAt(targets[i % targets.Count], 0f);
-            }
-            else
-            {
-                // One enemy: a small fan, centred on it
-                float angle = (i - (Projectiles - 1) / 2f) * singleTargetSpreadDegrees;
-                FireAt(targets[0], angle);
-            }
+            int t = i % targetCount;                                            // which enemy
+            int k = i / targetCount;                                            // how many bolts already went to it
+            int boltsForThisTarget = (Projectiles - t + targetCount - 1) / targetCount;   // ceil
+            float angle = (k - (boltsForThisTarget - 1) / 2f) * singleTargetSpreadDegrees;
+            FireAt(targets[t], angle);
         }
         return true;
     }

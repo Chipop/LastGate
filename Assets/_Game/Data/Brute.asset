@@ -18,6 +18,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e1441006f7feaca41bb9c41f84b936cf, type: 3}
   - {fileID: 21300000, guid: 9ca1e8dae3d44f744b101f67f3610ed9, type: 3}
   hitRadius: 0.9
+  knockback: 0
   deathColor: {r: 0.7294118, g: 0, b: 1, a: 1}
   id: brute
   hp: 200

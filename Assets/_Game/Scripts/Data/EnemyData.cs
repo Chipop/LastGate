@@ -5,6 +5,7 @@ public class EnemyData : ScriptableObject
 {
     public Sprite[] frames;
     public float hitRadius = 0.5f;
+    public float knockback = 1f;        // 1 = pushed the normal distance by a hit, 0 = can't be pushed (brute)
     public Color deathColor = Color.red;
 
     public string id = "walker";

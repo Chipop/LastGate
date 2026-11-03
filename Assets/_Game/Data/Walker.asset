@@ -18,6 +18,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 47a850286e0b35a4b9e8776302f20a5f, type: 3}
   - {fileID: 21300000, guid: 61a7afb10b7750d4fbd2de7206794f3c, type: 3}
   hitRadius: 0.45
+  knockback: 1
   deathColor: {r: 0, g: 1, b: 0.11642957, a: 1}
   id: walker
   hp: 30
