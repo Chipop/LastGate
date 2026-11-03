@@ -20,8 +20,14 @@ public class MageController : MonoBehaviour
     public int Pierce { get; set; }
     public int BombLevel { get; set; }
     public int FrostLevel { get; set; }
+    public float FrostSeconds => frostSeconds;
 
     // Custom Methods
+    public float FrostSlowAt(int level)
+    {
+        if (level <= 0) return 0f;
+        return frostSlowPerLevel[Mathf.Min(level, frostSlowPerLevel.Length - 1)];
+    }
 
     private Projectile.ShotParams BuildShot()
     {
@@ -30,8 +36,7 @@ public class MageController : MonoBehaviour
         shot.pierce = Pierce;
         if (FrostLevel > 0)
         {
-            int index = Mathf.Min(FrostLevel, frostSlowPerLevel.Length - 1);
-            shot.slowPercent = frostSlowPerLevel[index];
+            shot.slowPercent = FrostSlowAt(FrostLevel);
             shot.slowSeconds = frostSeconds;
         }
         return shot;

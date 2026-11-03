@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 93e20d6fe04694f41a4e081e0f503fed
+guid: 3bbc86c2c4efdd14c90a4b4349d29196
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5319334670055409119
-    second: Bolt1_0
+      213: 8367837715584827882
+    second: icon_reinforce_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bolt1_0
+      name: icon_reinforce_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 7
-        height: 8
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fd5821a03b212d940800000000000000
-      internalID: 5319334670055409119
+      spriteID: ae1cc8f4118802470800000000000000
+      internalID: 8367837715584827882
       vertices: []
       indices: 
       edges: []

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4ae8c4a4f1741a543bfe75ba560112e0
+guid: cb6ff21af82a0604f98d7d00ee1feef8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6607481912129624618
-    second: Fireball_0
+      213: -2110880465361091381
+    second: Fireball16_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Fireball_0
+      name: Fireball16_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 8
-        height: 8
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6d5e1b775328d44a0800000000000000
-      internalID: -6607481912129624618
+      spriteID: bc447d29665a4b2e0800000000000000
+      internalID: -2110880465361091381
       vertices: []
       indices: 
       edges: []

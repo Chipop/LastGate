@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BonusCard
   id: fireball
   cardName: Fireball
-  description: Every 4 s a fireball blasts enemies in a radius
-  icon: {fileID: 0}
+  description: Every 4 s a fireball blasts a group of enemies
+  icon: {fileID: 21300000, guid: 9ae4f85653048d34aa1db944691c5bf8, type: 3}
   rarity: 2
   maxStack: 3
   effect: 5

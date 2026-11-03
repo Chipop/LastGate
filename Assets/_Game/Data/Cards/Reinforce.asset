@@ -15,7 +15,7 @@ MonoBehaviour:
   id: reinforce
   cardName: Reinforce
   description: +300 gate HP
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 3bbc86c2c4efdd14c90a4b4349d29196, type: 3}
   rarity: 0
   maxStack: 4
   effect: 4

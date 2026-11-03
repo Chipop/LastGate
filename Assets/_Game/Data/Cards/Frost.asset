@@ -15,7 +15,7 @@ MonoBehaviour:
   id: frost
   cardName: Frost
   description: Shots slow enemies
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 9dbb967881631b04991b1b39f8142e12, type: 3}
   rarity: 2
   maxStack: 2
   effect: 6

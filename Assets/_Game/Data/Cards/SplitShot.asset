@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BonusCard
   id: split_shot
   cardName: Split Shot
-  description: "+1 projectile, \u221210 % damage"
-  icon: {fileID: 0}
+  description: +1 projectile, -10 % damage
+  icon: {fileID: 21300000, guid: cef6a5a2260c69e4ea1ecc88d8362f88, type: 3}
   rarity: 1
   maxStack: 3
   effect: 2

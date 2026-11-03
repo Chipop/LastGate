@@ -18,6 +18,10 @@ public class BombLauncher : MonoBehaviour
     private List<Enemy> victims = new List<Enemy>();
 
     // Custom Methods
+    public float Interval => interval;
+    public float DamageAt(int level) => baseDamage + damagePerExtraLevel * (level - 1);
+    public float RadiusAt(int level) => baseRadius + radiusPerExtraLevel * (level - 1);
+
     private void Throw()
     {
         Enemy target = targetSelector.GetBestTarget();
@@ -29,8 +33,8 @@ public class BombLauncher : MonoBehaviour
         }
 
         int level = mage.BombLevel;
-        float damage = baseDamage + damagePerExtraLevel * (level - 1);
-        float radius = baseRadius + radiusPerExtraLevel * (level - 1);
+        float damage = DamageAt(level);
+        float radius = RadiusAt(level);
 
         Bomb bomb = Instantiate(bombPrefab);
         bomb.Launch(muzzle.position, target.transform.position, bombSpeed, radius,

@@ -10,6 +10,7 @@ public class LevelUpUI : MonoBehaviour
     [SerializeField] private Image[] cardImages;
     [SerializeField] TMP_Text[] names;
     [SerializeField] TMP_Text[] descriptions;
+    [SerializeField] TMP_Text[] stacks;
     [SerializeField] private Image[] icons;
     [SerializeField] private GameObject[] newTags;
     [SerializeField] private Button rerollButton;
@@ -35,10 +36,11 @@ public class LevelUpUI : MonoBehaviour
 
             BonusCard card = cards[i];
             names[i].text = card.cardName;
-            descriptions[i].text = card.description;
+            descriptions[i].text = bonusService.Describe(card);
+            stacks[i].text = card.maxStack == 0 ? "" : $"Stack {bonusService.StackOf(card) + 1}/{card.maxStack}";
             cardImages[i].color = rarityColors[(int)card.rarity];
             if (card.icon != null) icons[i].sprite = card.icon;
-            newTags[i].SetActive(bonusService.IsNew(card));
+            newTags[i].GetComponent<TMP_Text>().enabled = bonusService.IsNew(card);   // hide the text, keep the layout slot
         }
 
         rerollLabel.text = rerollFree ? "Reroll - FREE" : $"Reroll - {rerollCost} gems";
