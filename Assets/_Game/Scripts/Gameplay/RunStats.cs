@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class RunStats
 {
+    private GameConfig config;
     public int xp;
     public int totalXp;
     public int playerLevel = 1;
@@ -11,8 +12,13 @@ public class RunStats
     public int wavesCleared;
     public int LevelsCleared;
 
-    public int XpNext => Mathf.RoundToInt(50f * Mathf.Pow(1.35f, playerLevel - 1));
+    public int XpNext => Mathf.RoundToInt(config.xpBase * Mathf.Pow(config.xpGrowth, playerLevel - 1));
     public int Score => totalXp + 100 * wavesCleared + 500 * LevelsCleared;
+
+    public RunStats(GameConfig config)
+    {
+        this.config = config;
+    }
 
     public struct ChangedEventArgs
     {

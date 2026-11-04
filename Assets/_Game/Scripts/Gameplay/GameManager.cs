@@ -10,6 +10,7 @@ public enum GameState { Title, Running, LevelUp, Paused, GameOver }
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private GameConfig config;
     [SerializeField] GameObject pausePanel;
     [SerializeField] Button resumeButton;
     [SerializeField] Button restartButton;
@@ -30,17 +31,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] LevelUpUI levelUpUI;
     [SerializeField] HudUI hudUI;
     [SerializeField] private AudioService audioService;
-    private const int RerollBaseCost = 10;
-    private const int RerollStep = 5;
     private List<BonusCard> drawedCards;
     private int pendingLevelUps;
     private int freeRerolls;
     private int paidRerolls;
-    private readonly RunStats stats = new();
+    private RunStats stats;
     private Coroutine hitStop;
 
-    // 10 for the first paid reroll, then +5 for each further one in the same panel
-    private int RerollCost => RerollBaseCost + RerollStep * paidRerolls;
+    // Each paid reroll in this panel adds the configured price increase.
+    private int RerollCost => config.rerollBaseCost + config.rerollStep * paidRerolls;
 
     
     private void setState(GameState newState)
@@ -86,9 +85,11 @@ public class GameManager : MonoBehaviour
     private IEnumerator HitStopRoutine(float seconds)
     {
         Time.timeScale = 0f;
-        yield return new WaitForSecondsRealtime(seconds);   // real time: scaled time is stopped
+        // real time: scaled time is stopped
+        yield return new WaitForSecondsRealtime(seconds);   
         hitStop = null;
-        ApplyTimeScale();                                   // back to whatever the CURRENT state wants: x1, x2, or still paused
+        // back to whatever the CURRENT state wants: x1, x2, or still paused
+        ApplyTimeScale();                                   
     }
 
     private void ShowCards()
@@ -263,6 +264,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 60;
+        stats = new RunStats(config);
     }
 
     void Start()

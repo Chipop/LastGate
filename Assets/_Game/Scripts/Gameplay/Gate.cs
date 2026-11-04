@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class Gate : MonoBehaviour
 {
-    public int MaxHp { get; private set; } = 1000;
+    [SerializeField] private GameConfig config;
+    public int MaxHp { get; private set; }
     public float Hp { get; private set; }
 
     // Events
@@ -62,6 +63,7 @@ public class Gate : MonoBehaviour
 
     private void Awake()
     {
+        MaxHp = config.gateMaxHp;
         Hp = MaxHp;
     }
 }

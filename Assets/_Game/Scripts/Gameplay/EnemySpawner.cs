@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    [SerializeField] private GameConfig config;
     [SerializeField] private List<LevelData> authoredLevels;
     [SerializeField] private Gate gate;
     [SerializeField] private EnemyPool enemyPool;
@@ -17,9 +18,6 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float gateLineY = -7f;
     [SerializeField] private float spawnXMin = -4.8f;
     [SerializeField] private float spawnXMax = 4.8f;
-    [SerializeField] private int waveAliveThreshold = 3;
-    [SerializeField] private float waveTimeout = 25f;
-    [SerializeField] private float restBetweenLevels = 3f;
 
     public int Level { get; private set; } = 1;
     public int Wave {  get; private set; }
@@ -47,8 +45,8 @@ public class EnemySpawner : MonoBehaviour
         Vector2 spawnPos = new Vector2(randomX, spawnY);
 
         // hp multiplier depending on the level
-        float hp = enemyData.hp * (1f + 0.25f * (level-1));
-        float speed = enemyData.speed * (Mathf.Min(1.5f, 1f + 0.03f * (level - 1)));
+        float hp = enemyData.hp * (1f + config.hpGrowthPerLevel * (level-1));
+        float speed = enemyData.speed * Mathf.Min(config.speedMultiplierCap, 1f + config.speedGrowthPerLevel * (level - 1));
 
         Enemy enemy = enemyPool.Get();
         enemy.Init(enemyData, spawnPos, hp, speed, enemyData.attackDamage, enemyData.attackInterval, enemyData.xp, enemyData.size, enemyData.tint, gateLineY);
@@ -93,7 +91,7 @@ public class EnemySpawner : MonoBehaviour
         }
 
         float waveTimer = 0;
-        while (enemyPool.Live.Count >= waveAliveThreshold && waveTimer < waveTimeout)
+        while (enemyPool.Live.Count >= config.waveAliveThreshold && waveTimer < config.waveTimeout)
         {
             waveTimer += Time.deltaTime;
             yield return null;
@@ -128,7 +126,7 @@ public class EnemySpawner : MonoBehaviour
             yield return null;
         }
         OnLevelCleared?.Invoke();
-        yield return new WaitForSeconds(restBetweenLevels);
+        yield return new WaitForSeconds(config.restBetweenLevels);
     }
 
     public void Begin()

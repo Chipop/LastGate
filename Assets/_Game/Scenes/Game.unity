@@ -1948,15 +1948,15 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7706766155818749191, guid: a642f9b96a65439409a3879ce10b573d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a642f9b96a65439409a3879ce10b573d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 3}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!1 &432856156
@@ -2463,7 +2463,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 16.71875
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -4658,6 +4658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 945d5cefef67fe6488c6b51243ca1c51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  config: {fileID: 11400000, guid: bdb964fea34bb284da4606bcf74239c2, type: 2}
 --- !u!1 &1136075994
 GameObject:
   m_ObjectHideFlags: 0
