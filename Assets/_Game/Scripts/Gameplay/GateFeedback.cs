@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class GateFeedback : MonoBehaviour
     private float previousHp;
     private float lastFeedbackTime = -10f;
     private Coroutine vignetteRoutine;
+    public event Action OnFeedbackTriggered;
 
     // Custom Methods
     private void Gate_OnHpChanged(Gate.OnHpChangedEventArgs args)
@@ -22,6 +24,9 @@ public class GateFeedback : MonoBehaviour
 
         // Unscaled time: a throttle measured in game time would stop working while the game is paused
         if (Time.unscaledTime - lastFeedbackTime < minSecondsBetweenFeedback) return;
+        
+        OnFeedbackTriggered?.Invoke();
+
         lastFeedbackTime = Time.unscaledTime;
 
         cameraShake.Shake(shakeAmplitude, shakeSeconds);

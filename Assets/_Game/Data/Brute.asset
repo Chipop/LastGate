@@ -30,3 +30,4 @@ MonoBehaviour:
   gemsMin: 1
   gemsMax: 2
   tint: {r: 1, g: 1, b: 1, a: 1}
+  deathSound: {fileID: 8300000, guid: 202e263e20b1ab14899b488e328fe35f, type: 3}

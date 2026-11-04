@@ -18,6 +18,7 @@ public class LevelUpUI : MonoBehaviour
     [SerializeField] TMP_Text rerollLabel;
     [SerializeField] Color[] rarityColors;       // size 3 in the Inspector: Common, Rare, Epic
     private List<BonusCard> currentBonusCards = new List<BonusCard>();
+    public event Action OnShown;
 
     public event Action<BonusCard> OnPicked;
     public event Action OnReroll;
@@ -25,7 +26,10 @@ public class LevelUpUI : MonoBehaviour
     // Custom Methods
     public void Show(List<BonusCard> cards, BonusService bonusService, int gems, int rerollCost, bool rerollFree)
     {
+        bool wasHidden = !gameObject.activeSelf;
         gameObject.SetActive(true);
+        if (wasHidden) OnShown?.Invoke();
+        
         currentBonusCards = new List<BonusCard>(cards);
 
         // a reroll or a second level-up reuses the panel
@@ -67,6 +71,7 @@ public class LevelUpUI : MonoBehaviour
         const float seconds = 0.15f;
         while (elapsed < seconds)
         {
+            // increment the elapsed time by the unscaled delta time
             elapsed += Time.unscaledDeltaTime;
             float t = elapsed / seconds;
             // grows then returns

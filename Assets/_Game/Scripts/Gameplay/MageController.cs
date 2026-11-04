@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,6 +22,7 @@ public class MageController : MonoBehaviour
     public int BombLevel { get; set; }
     public int FrostLevel { get; set; }
     public float FrostSeconds => frostSeconds;
+    public event Action OnFired;
 
     // Custom Methods
     public float FrostSlowAt(int level)
@@ -124,6 +126,7 @@ public class MageController : MonoBehaviour
         if (nearestEnemy != null)
         {
             FireVolley();
+            OnFired?.Invoke();
         }
     }
 

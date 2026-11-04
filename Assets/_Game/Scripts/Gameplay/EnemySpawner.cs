@@ -32,8 +32,14 @@ public class EnemySpawner : MonoBehaviour
     public event Action OnLevelCleared;
     public event Action OnWaveCleared;
     public event Action<Enemy> OnEnemyKilled;
+    public event Action<Enemy> OnEnemyDamaged;
     private void Killed(Enemy e) => OnEnemyKilled?.Invoke(e);
 
+    private void Enemy_OnDamaged(Enemy enemy) 
+    {
+        OnEnemyDamaged?.Invoke(enemy); 
+    }
+    
     // Custom methods
     public void Spawn(EnemyData enemyData, int level)
     {
@@ -49,7 +55,10 @@ public class EnemySpawner : MonoBehaviour
         gate.Watch(enemy);
         enemy.OnDied -= Killed;
         enemy.OnDied += Killed;
+        enemy.OnDamaged -= Enemy_OnDamaged;
+        enemy.OnDamaged += Enemy_OnDamaged;
     }
+    
 
     private IEnumerator SpawnGroupRoutine(SpawnGroup group)
     {

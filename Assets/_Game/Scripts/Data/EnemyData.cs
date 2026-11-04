@@ -18,4 +18,5 @@ public class EnemyData : ScriptableObject
     public int gemsMin = 0;
     public int gemsMax = 0;
     public Color tint = Color.green;
+    public AudioClip deathSound;
 }

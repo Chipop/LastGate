@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject pausePanel;
     [SerializeField] Button resumeButton;
     [SerializeField] Button restartButton;
+    [SerializeField] Button muteButton;
     [SerializeField] Button quitToTitleButton;
     private float desiredSpeed = 1f;
     private GameState state = GameState.Title;
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] BonusService bonusService;
     [SerializeField] LevelUpUI levelUpUI;
     [SerializeField] HudUI hudUI;
+    [SerializeField] private AudioService audioService;
     private const int RerollBaseCost = 10;
     private const int RerollStep = 5;
     private List<BonusCard> drawedCards;
@@ -40,6 +42,7 @@ public class GameManager : MonoBehaviour
     // 10 for the first paid reroll, then +5 for each further one in the same panel
     private int RerollCost => RerollBaseCost + RerollStep * paidRerolls;
 
+    
     private void setState(GameState newState)
     {
         state = newState;
@@ -191,6 +194,7 @@ public class GameManager : MonoBehaviour
     private void RestartRun()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        audioService.StartMusic();
     }
 
     // Handlers
@@ -237,6 +241,11 @@ public class GameManager : MonoBehaviour
         hudUI.SetGems(args.gems);
     }
 
+    private void RefreshMuteLabel()
+    {
+        muteButton.GetComponentInChildren<TMP_Text>().text = audioService.IsMuted ? "SOUND : OFF" : "SOUND : ON";
+    }
+
     
     private void StartRun()
     {
@@ -273,6 +282,7 @@ public class GameManager : MonoBehaviour
         resumeButton.onClick.AddListener(Resume);
         restartButton.onClick.AddListener(RestartRun);
         quitToTitleButton.onClick.AddListener(RestartRun);
+        muteButton.onClick.AddListener(() => { audioService.ToggleMute(); RefreshMuteLabel(); });
 
         bestScoreTMP.text = $"BEST {PlayerPrefs.GetInt("best_score", 0)}";
     }

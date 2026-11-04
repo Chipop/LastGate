@@ -31,6 +31,7 @@ public class Enemy : MonoBehaviour
     private int xp;
     private float gateLineY;
     public event Action<Enemy> OnReachedGate;
+    public event Action<Enemy> OnDamaged;
     public event Action<Enemy> OnDied;
     public struct AttackParams { public float attackDamage; }
     public event Action<AttackParams> OnAttack;
@@ -87,6 +88,8 @@ public class Enemy : MonoBehaviour
         hitFlashTimer = 0.08f;
         RefreshTint();
 
+        OnDamaged?.Invoke(this);
+        
         if (hp <= 0)
         {
             OnDied?.Invoke(this);
