@@ -1956,7 +1956,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!1 &432856156
@@ -2463,7 +2463,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 16.71875
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -4957,6 +4957,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1152179303}
   - component: {fileID: 1152179304}
+  - component: {fileID: 1152179305}
   m_Layer: 5
   m_Name: HUD
   m_TagString: Untagged
@@ -5005,6 +5006,18 @@ MonoBehaviour:
   pauseButton: {fileID: 1840847601}
   speedButton: {fileID: 1521079916}
   speedButtonLabel: {fileID: 432856158}
+--- !u!114 &1152179305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1152179302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff0cec2fa2fcb3f479ff407fb44f47c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1 &1179098769
 GameObject:
   m_ObjectHideFlags: 0
@@ -9333,8 +9346,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_Resource: {fileID: 8300000, guid: 0d044854305e9374ab1909dfb1621ef1, type: 3}
+  m_PlayOnAwake: 1
   m_Volume: 0.4
   m_Pitch: 1
   Loop: 1

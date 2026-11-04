@@ -180,15 +180,17 @@ public class GameManager : MonoBehaviour
     private void GameOver()
     {
         setState(GameState.GameOver);
+        int score = stats.Score;
         int best = PlayerPrefs.GetInt("best_score", 0);
-        if (stats.totalXp > best)
+        bool isNewBest = score > best;
+        if (isNewBest)
         {
-            PlayerPrefs.SetInt("best_score", stats.totalXp);
+            PlayerPrefs.SetInt("best_score", score);
             PlayerPrefs.Save();
         }
-        Analytics.Track("run_end", new() { ["score"] = stats.totalXp, ["wavesCleared"] = stats.wavesCleared });
+        Analytics.Track("run_end", new() { ["score"] = score, ["wavesCleared"] = stats.wavesCleared });
         
-        gameOverUI.Show(stats.totalXp, Mathf.Max(best, stats.totalXp), stats.totalXp > best, stats.playerLevel, stats.wavesCleared);
+        gameOverUI.Show(score, Mathf.Max(best, score), isNewBest, stats.playerLevel, stats.wavesCleared);
     }
 
     private void RestartRun()
@@ -257,6 +259,12 @@ public class GameManager : MonoBehaviour
 
 
     // Unity Lifecycle
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 60;
+    }
+
     void Start()
     {
         gate.OnDestroyed += GameOver;
