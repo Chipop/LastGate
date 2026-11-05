@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     private int paidRerolls;
     private RunStats stats;
     private Coroutine hitStop;
+    [SerializeField] private AnalyticsConsentUI analyticsConsent;
 
     // Each paid reroll in this panel adds the configured price increase.
     private int RerollCost => config.rerollBaseCost + config.rerollStep * paidRerolls;
@@ -265,6 +266,17 @@ public class GameManager : MonoBehaviour
     {
         Application.targetFrameRate = 60;
         stats = new RunStats(config);
+
+        ResponsiveCanvas.Configure(hudUI.GetComponentInParent<Canvas>(), new Vector2(1080, 1920));
+        ResponsiveCanvas.FitToSafeArea(hudUI.gameObject);
+        ResponsiveCanvas.FitToSafeArea(titlePanel);
+        ResponsiveCanvas.FitToSafeArea(pausePanel);
+        ResponsiveCanvas.FitToSafeArea(levelUpUI.gameObject);
+        ResponsiveCanvas.FitToSafeArea(gameOverUI.gameObject);
+
+        PlayFabBackend.Initialize();
+
+        analyticsConsent.Initialize();
     }
 
     void Start()
@@ -300,6 +312,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         if (state != GameState.Title) return;
+        if (analyticsConsent.BlocksStart) return;
         if(Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
         {
             StartRun();
