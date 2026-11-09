@@ -11,14 +11,24 @@ using UnityEngine.UnityConsent;
 // Visuals and references are authored in Game.unity; this handles behavior only.
 public class AnalyticsConsentUI : MonoBehaviour
 {
-    private const string ChoiceKey = "analytics_consent_v2";
+    private const string ChoiceKey = Analytics.ConsentKey;
     [SerializeField] private GameObject overlay;
+    [SerializeField] private TMP_Text headingText;
+    [SerializeField] private TMP_Text bodyText;
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private Button allowButton;
     [SerializeField] private Button declineButton;
     [SerializeField] private Button[] settingsButtons;
     private bool servicesReady;
+    private bool servicesStarting;
+    private bool showingPolicy;
+    private string consentHeading;
+    private string consentBody;
+    private string declineCaption;
+    private TMP_Text declineLabel;
     private int lastInteractionFrame = -1;
+
+    public bool IsOpen => overlay.activeSelf;
 
     public bool BlocksStart
     {
@@ -40,16 +50,49 @@ public class AnalyticsConsentUI : MonoBehaviour
 
     public void Initialize()
     {
+        // An open Unity scene may still have the older serialization until it is reloaded.
+        if (headingText == null || bodyText == null)
+        {
+            foreach (TMP_Text label in overlay.GetComponentsInChildren<TMP_Text>(true))
+            {
+                if (headingText == null && label.name == "HeadingLabel") headingText = label;
+                if (bodyText == null && label.name == "DescriptionLabel") bodyText = label;
+            }
+        }
+        consentHeading = headingText.text;
+        consentBody = bodyText.text;
+        declineLabel = declineButton.GetComponentInChildren<TMP_Text>(true);
+        declineCaption = declineLabel.text;
         allowButton.onClick.AddListener(Allow);
         declineButton.onClick.AddListener(Decline);
         foreach (Button button in settingsButtons)
             button.onClick.AddListener(Open);
-        overlay.SetActive(!PlayerPrefs.HasKey(ChoiceKey));
-        InitializeServices();
+        overlay.SetActive(false);
+        ApplyConsent(false);
+        if (Analytics.HasConsent) StartOptionalServices();
     }
 
     private void Allow() => Choose(true);
-    private void Decline() => Choose(false);
+    private void Decline()
+    {
+        if (showingPolicy) Close();
+        else Choose(false);
+    }
+
+    public void OpenPrivacyPolicy()
+    {
+        showingPolicy = true;
+        headingText.text = "Privacy Policy";
+        bodyText.text =
+            "Last Gate stores your best score and settings locally. It contacts our server for balance settings and public scores.\n\n" +
+            "Analytics are on by default. You can turn them off in Settings. " +
+            "Gameplay events go to Last Gate, Unity Analytics, and Microsoft PlayFab. " +
+            "Last Gate may record device, browser, source, country and IP. Eligible scores can appear publicly under guest names.";
+        statusText.text = "Last Gate playtest events: 90 days.\nQuestions: contact@yanvision.ma";
+        allowButton.gameObject.SetActive(false);
+        declineLabel.text = "Close";
+        overlay.SetActive(true);
+    }
 
     private void OnDestroy()
     {
@@ -60,11 +103,15 @@ public class AnalyticsConsentUI : MonoBehaviour
             if (button != null) button.onClick.RemoveListener(Open);
     }
 
+    private void StartOptionalServices()
+    {
+        PlayFabBackend.Initialize();
+        if (!servicesStarting) InitializeServices();
+    }
+
     private async void InitializeServices()
     {
-        // No analytics collection until the saved/player choice is applied.
-        ApplyConsent(false);
-
+        servicesStarting = true;
         try
         {
             if (UnityServices.State != ServicesInitializationState.Initialized)
@@ -78,40 +125,28 @@ public class AnalyticsConsentUI : MonoBehaviour
             if (this == null) return;
 
             servicesReady = true;
-            ApplyConsent(PlayerPrefs.GetInt(ChoiceKey, 0) == 1);
+            ApplyConsent(Analytics.HasConsent);
 
             Debug.Log("[UGS] Services initialized.");
-        }
-        catch (Exception exception)
-        {
-            Debug.LogWarning(
-                $"[UGS] Initialization failed. You can still play. {exception.Message}"
-            );
 
-            return;
-        }
-
-        // Authentication is separate from analytics consent.
-        // A guest account will also be useful for the leaderboard.
-        try
-        {
+            if (!Analytics.HasConsent) return;
             if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
             }
 
-            if (this == null) return;
-
-            Debug.Log(
-                $"[UGS] Signed in. Player ID: " +
-                AuthenticationService.Instance.PlayerId
-            );
+            if (!Analytics.HasConsent && AuthenticationService.Instance.IsSignedIn)
+                AuthenticationService.Instance.SignOut();
         }
         catch (Exception exception)
         {
             Debug.LogWarning(
-                $"[UGS] Guest login failed. You can still play. {exception.Message}"
+                $"[UGS] Optional services failed. You can still play. {exception.Message}"
             );
+        }
+        finally
+        {
+            servicesStarting = false;
         }
     }
 
@@ -128,19 +163,36 @@ public class AnalyticsConsentUI : MonoBehaviour
     {
         PlayerPrefs.SetInt(ChoiceKey, allowed ? 1 : 0);
         PlayerPrefs.Save();
+        if (allowed) StartOptionalServices();
+        else
+        {
+            DjangoPlaytest.ClearPending();
+            PlayFabBackend.EndSession();
+            if (servicesReady && AuthenticationService.Instance.IsSignedIn)
+                AuthenticationService.Instance.SignOut();
+        }
         // Denial is immediate; granting waits until initialization has completed.
         ApplyConsent(allowed && servicesReady);
+        Close();
+    }
+
+    private void Close()
+    {
         lastInteractionFrame = Time.frameCount;
         overlay.SetActive(false);
     }
 
-    private void Open()
+    public void Open()
     {
+        showingPolicy = false;
+        headingText.text = consentHeading;
+        bodyText.text = consentBody;
+        allowButton.gameObject.SetActive(true);
+        declineLabel.text = declineCaption;
         lastInteractionFrame = Time.frameCount;
-        statusText.text = !PlayerPrefs.HasKey(ChoiceKey)
-            ? "Your choice is optional. You can change it later."
-            : "Current choice: " + (PlayerPrefs.GetInt(ChoiceKey) == 1 ? "allowed" : "declined") +
-              ". Choose again below.";
+        statusText.text = Analytics.HasConsent
+            ? "Analytics are on. You can turn them off below."
+            : "Analytics are off. You can turn them on below.";
         overlay.SetActive(true);
     }
 

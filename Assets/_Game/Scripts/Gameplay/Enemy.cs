@@ -18,9 +18,10 @@ public class Enemy : MonoBehaviour
     private Vector2 pushVelocity;
     [SerializeField] private float flinchDistance = 0.125f;   // 2 art pixels at 16 PPU
     [SerializeField] private float flinchSeconds = 0.08f;
-    private Vector2 flinchOffset;
+    private Vector3 spriteRestPosition;
     private float flinchTimer;
     public string Id { get; private set; }
+    public int SpawnVersion { get; private set; }
     public EnemyData Data { get; private set; }
     private float wobbleSeed;
     private float hp;
@@ -52,15 +53,16 @@ public class Enemy : MonoBehaviour
     // Custom Methods
     public void Init(EnemyData data, Vector2 spawnPos, float hp, float speed, float attackDamage, float attackInterval , int xp, float size, Color tint, float gateLineY)
     {
+        SpawnVersion++;
         this.Data = data;
         this.Id = data.id;
-        this.transform.position = spawnPos;
         this.hp = hp;
         this.speed = speed;
         this.attackDamage = attackDamage;
         this.attackInterval = attackInterval;
         this.xp = xp;
         this.gateLineY = gateLineY;
+        SetPositionAtOrAboveGate(spawnPos);
         //reset cooldown for pooled enemies
         this.attackCooldown = 0f;
         baseTint = tint;
@@ -68,7 +70,7 @@ public class Enemy : MonoBehaviour
         slowTimer = 0f;
         hitFlashTimer = 0f;
         pushVelocity = Vector2.zero;
-        flinchOffset = Vector2.zero;
+        sr.transform.localPosition = spriteRestPosition;
         flinchTimer = 0f;
         baseTint = tint;
         RefreshTint();
@@ -109,15 +111,19 @@ public class Enemy : MonoBehaviour
         OnAttack?.Invoke(new AttackParams { attackDamage = this.attackDamage });
     }
 
-    // A visual flinch: the enemy is drawn 2 px along `direction` for a few frames, then exactly back.
-    // Net movement is zero, so it changes nothing about when the enemy reaches the gate.
+    // Move only the sprite so the hitbox and attack timing stay stable.
     public void Flinch(Vector2 direction)
     {
         if (direction == Vector2.zero) return;
-        transform.position -= (Vector3)flinchOffset;          // undo a flinch still in progress
-        flinchOffset = direction.normalized * flinchDistance;
-        transform.position += (Vector3)flinchOffset;
+        sr.transform.position = transform.TransformPoint(spriteRestPosition)
+            + (Vector3)(direction.normalized * flinchDistance);
         flinchTimer = flinchSeconds;
+    }
+
+    private void SetPositionAtOrAboveGate(Vector3 position)
+    {
+        position.y = Mathf.Max(position.y, gateLineY);
+        transform.position = position;
     }
 
     // Shove the enemy `distance` units along `direction` (scaled by its data); the push fades out over a few frames.
@@ -142,6 +148,7 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         wobbleSeed = UnityEngine.Random.value * 10f;
+        spriteRestPosition = sr.transform.localPosition;
     }
 
 
@@ -167,14 +174,13 @@ public class Enemy : MonoBehaviour
             flinchTimer -= Time.deltaTime;
             if (flinchTimer <= 0f)
             {
-                transform.position -= (Vector3)flinchOffset;
-                flinchOffset = Vector2.zero;
+                sr.transform.localPosition = spriteRestPosition;
             }
         }
 
         if (pushVelocity != Vector2.zero)
         {
-            transform.position += (Vector3)(pushVelocity * Time.deltaTime);
+            SetPositionAtOrAboveGate(transform.position + (Vector3)(pushVelocity * Time.deltaTime));
             pushVelocity *= Mathf.Exp(-pushDrag * Time.deltaTime);
             if (pushVelocity.sqrMagnitude < 0.0001f) pushVelocity = Vector2.zero;
         }
@@ -192,9 +198,9 @@ public class Enemy : MonoBehaviour
 
         float wobble = Mathf.Sin((Time.time + wobbleSeed) * 2f * Mathf.PI * 2f) * 0.15f;
 
-        //transform.position += Vector3.down * speed * Time.deltaTime;
         float newSpeed = speed * slowMultiplier;
-        transform.position += new Vector3(wobble * Time.deltaTime, -newSpeed * Time.deltaTime, 0f);
+        SetPositionAtOrAboveGate(transform.position
+            + new Vector3(wobble * Time.deltaTime, -newSpeed * Time.deltaTime, 0f));
 
     }
 

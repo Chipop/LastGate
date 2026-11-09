@@ -36,7 +36,7 @@ public class BombFeedback : MonoBehaviour
             createFunc: CreateFx,
             actionOnGet: fx => fx.gameObject.SetActive(true),
             actionOnRelease: fx => fx.gameObject.SetActive(false),
-            actionOnDestroy: fx => Destroy(fx.gameObject),
+            actionOnDestroy: fx => { if (fx != null) Destroy(fx.gameObject); },
             collectionCheck: false,
             defaultCapacity: 4,
             maxSize: 8);
@@ -45,5 +45,11 @@ public class BombFeedback : MonoBehaviour
     private void Start()
     {
         launcher.OnBlast += Launcher_OnBlast;
+    }
+
+    private void OnDestroy()
+    {
+        if (launcher != null) launcher.OnBlast -= Launcher_OnBlast;
+        pool?.Dispose();
     }
 }

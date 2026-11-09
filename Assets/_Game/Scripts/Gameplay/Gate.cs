@@ -61,9 +61,15 @@ public class Gate : MonoBehaviour
         Heal(points);
     }
 
+    public void SetStartingHealth(int maxHp)
+    {
+        MaxHp = maxHp;
+        Hp = MaxHp;
+        OnHpChanged?.Invoke(new OnHpChangedEventArgs { hp = Hp, maxHp = MaxHp });
+    }
+
     private void Awake()
     {
-        MaxHp = config.gateMaxHp;
-        Hp = MaxHp;
+        SetStartingHealth(config.gateMaxHp);
     }
 }

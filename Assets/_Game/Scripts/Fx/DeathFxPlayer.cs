@@ -28,7 +28,7 @@ public class DeathFxPlayer : MonoBehaviour
             createFunc: CreateFx,
             actionOnGet: fx => fx.gameObject.SetActive(true),
             actionOnRelease: fx => fx.gameObject.SetActive(false),
-            actionOnDestroy: fx => Destroy(fx.gameObject),
+            actionOnDestroy: fx => { if (fx != null) Destroy(fx.gameObject); },
             collectionCheck: false,
             defaultCapacity: 10,
             maxSize: 40);
@@ -37,5 +37,11 @@ public class DeathFxPlayer : MonoBehaviour
     private void Start()
     {
         spawner.OnEnemyKilled += Spawner_OnEnemyKilled;
+    }
+
+    private void OnDestroy()
+    {
+        if (spawner != null) spawner.OnEnemyKilled -= Spawner_OnEnemyKilled;
+        pool?.Dispose();
     }
 }

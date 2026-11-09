@@ -7,7 +7,8 @@ using UnityEngine.UnityConsent;
 
 public static class Analytics
 {
-    private const string ConsentKey = "analytics_consent_v2";
+    public const string ConsentKey = "analytics_consent_v4";
+    public static bool HasConsent => PlayerPrefs.GetInt(ConsentKey, 1) == 1;
 
     public static void Track(
         string name,
@@ -19,15 +20,17 @@ public static class Analytics
 
         Debug.Log($"[analytics] {name} {details}");
 
-        if (PlayerPrefs.GetInt(ConsentKey, 0) != 1)
+        if (!HasConsent)
         {
             if (name == "run_start")
-                Debug.Log("[analytics] Online gameplay events skipped: analytics consent is not granted. Open Analytics and choose Allow analytics to enable sending.");
+                Debug.Log("[analytics] Online gameplay events skipped: analytics are off. Turn them on in Privacy / Analytics to enable sending.");
             return;
         }
 
         // PlayFab runs independently of UGS availability.
         PlayFabBackend.Track(name, props);
+        // EndRun supplies the outcome and final score to the Django sender.
+        if (name != "run_end") DjangoPlaytest.Track(name, props);
 
         // UGS also requires successful initialization and SDK consent.
         if (UnityServices.State != ServicesInitializationState.Initialized)

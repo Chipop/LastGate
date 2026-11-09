@@ -10,18 +10,19 @@ public static class PlayFabBackend
     private const string TitleId = "10BD0E";
 
     private const string GuestIdKey = "playfab_guest_id";
-    private const string ConsentKey = "analytics_consent_v2";
 
     private static bool loginInProgress;
 
     public static void Initialize()
     {
-        if (loginInProgress || PlayFabClientAPI.IsClientLoggedIn())
+        if (!Analytics.HasConsent || loginInProgress || PlayFabClientAPI.IsClientLoggedIn())
         {
             return;
         }
 
         PlayFabSettings.staticSettings.TitleId = TitleId;
+        PlayFabSettings.DisableDeviceInfo = true;
+        PlayFabSettings.DisableFocusTimeCollection = true;
 
         // Generate once and retain across scene reloads and launches.
         string guestId = PlayerPrefs.GetString(GuestIdKey, "");
@@ -47,6 +48,11 @@ public static class PlayFabBackend
             result =>
             {
                 loginInProgress = false;
+                if (!Analytics.HasConsent)
+                {
+                    EndSession();
+                    return;
+                }
 
                 Debug.Log(
                     $"[PlayFab] Signed in. Player ID: {result.PlayFabId}"
@@ -63,12 +69,14 @@ public static class PlayFabBackend
         );
     }
 
+    public static void EndSession() => PlayFabClientAPI.ForgetAllCredentials();
+
     public static void Track(
         string eventName,
         Dictionary<string, object> properties = null)
     {
         // Enforce the same saved analytics choice for PlayFab.
-        if (PlayerPrefs.GetInt(ConsentKey, 0) != 1)
+        if (!Analytics.HasConsent)
         {
             return;
         }

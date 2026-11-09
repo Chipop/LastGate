@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -21,7 +20,7 @@ public class GameManager : MonoBehaviour
     public bool IsGameOver => state == GameState.GameOver;
 
     [SerializeField] GameObject titlePanel;
-    [SerializeField] TMP_Text bestScoreTMP;
+    [SerializeField] private TitleScreenUI titleScreen;
 
     [SerializeField] private GameOverUI gameOverUI;
 
@@ -38,9 +37,19 @@ public class GameManager : MonoBehaviour
     private RunStats stats;
     private Coroutine hitStop;
     [SerializeField] private AnalyticsConsentUI analyticsConsent;
+    [SerializeField] private string djangoBackendUrl;
+    [SerializeField] private DjangoPlaytest.ReleaseSource playtestSource;
 
     // Each paid reroll in this panel adds the configured price increase.
-    private int RerollCost => config.rerollBaseCost + config.rerollStep * paidRerolls;
+    private DjangoPlaytest.Balance runBalance;
+    private bool startingRun;
+    private bool reloadingScene;
+    private static bool replayOnLoad;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetReplayState() => replayOnLoad = false;
+    private int RerollCost => (runBalance?.rerollBaseCost ?? config.rerollBaseCost)
+        + (runBalance?.rerollStep ?? config.rerollStep) * paidRerolls;
 
     
     private void setState(GameState newState)
@@ -49,6 +58,7 @@ public class GameManager : MonoBehaviour
         ApplyTimeScale();
         titlePanel.SetActive(state == GameState.Title);
         pausePanel.SetActive(state == GameState.Paused);
+        hudUI.gameObject.SetActive(state != GameState.GameOver);
         Debug.Log($"Game State: {state}");
     }
 
@@ -164,12 +174,14 @@ public class GameManager : MonoBehaviour
     {
         if(state != GameState.Running) return;
         setState(GameState.Paused);
+        DjangoPlaytest.Track("run_paused");
     }
 
     private void Resume()
     {
         if (state != GameState.Paused) return;
         setState(GameState.Running);
+        DjangoPlaytest.Track("run_resumed");
     }
 
     private void ToggleSpeed()
@@ -191,14 +203,31 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.Save();
         }
         Analytics.Track("run_end", new() { ["score"] = score, ["wavesCleared"] = stats.wavesCleared });
+        DjangoPlaytest.EndRun("death", score, stats.wavesCleared);
         
-        gameOverUI.Show(score, Mathf.Max(best, score), isNewBest, stats.playerLevel, stats.wavesCleared);
+        gameOverUI.Show(score, Mathf.Max(best, score), isNewBest, stats.LevelsCleared, stats.wavesCleared);
     }
 
     private void RestartRun()
     {
+        if (state == GameState.Paused)
+            DjangoPlaytest.EndRun("restarted", stats.Score, stats.wavesCleared);
+        ReloadScene(replay: true);
+    }
+
+    private void QuitToTitle()
+    {
+        if (state == GameState.Paused)
+            DjangoPlaytest.EndRun("quit_to_title", stats.Score, stats.wavesCleared);
+        ReloadScene(replay: false);
+    }
+
+    private void ReloadScene(bool replay)
+    {
+        if (reloadingScene) return;
+        reloadingScene = true;
+        replayOnLoad = replay;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        audioService.StartMusic();
     }
 
     // Handlers
@@ -238,6 +267,7 @@ public class GameManager : MonoBehaviour
     private void Spawner_OnWaveStarted(EnemySpawner.OnWaveStartedArgs args)
     {
         hudUI.SetLevelWave(args.level, args.wave);
+        DjangoPlaytest.WaveStarted(args.level, args.wave);
     }
     private void Stats_OnChanged(RunStats.ChangedEventArgs args)
     {
@@ -251,9 +281,23 @@ public class GameManager : MonoBehaviour
     }
 
     
-    private void StartRun()
+    private IEnumerator StartRun()
     {
+        startingRun = true;
+        audioService.StartMusic();
+        runBalance = null;
+        yield return DjangoPlaytest.FetchBalance(balance => runBalance = balance);
+        while (titleScreen.TransitionPlaying) yield return null;
+        startingRun = false;
+        if (analyticsConsent.IsOpen)
+        {
+            titleScreen.CancelStart();
+            yield break;
+        }
+
+        gate.SetStartingHealth(runBalance?.gateMaxHp ?? config.gateMaxHp);
         setState(GameState.Running);
+        DjangoPlaytest.BeginRun(runBalance?.version ?? 0);
         Analytics.Track("run_start");
 
         spawner.Begin();
@@ -274,7 +318,7 @@ public class GameManager : MonoBehaviour
         ResponsiveCanvas.FitToSafeArea(levelUpUI.gameObject);
         ResponsiveCanvas.FitToSafeArea(gameOverUI.gameObject);
 
-        PlayFabBackend.Initialize();
+        DjangoPlaytest.Initialize(djangoBackendUrl, playtestSource);
 
         analyticsConsent.Initialize();
     }
@@ -298,25 +342,31 @@ public class GameManager : MonoBehaviour
         stats.OnChanged += Stats_OnChanged;
 
         gameOverUI.OnPlayAgainPressed += RestartRun;
-        gameOverUI.OnTitlePressed += RestartRun;
+        gameOverUI.OnTitlePressed += QuitToTitle;
         hudUI.OnPausePressed += Pause;
         hudUI.OnSpeedPressed += ToggleSpeed;
         resumeButton.onClick.AddListener(Resume);
         restartButton.onClick.AddListener(RestartRun);
-        quitToTitleButton.onClick.AddListener(RestartRun);
+        quitToTitleButton.onClick.AddListener(QuitToTitle);
         muteButton.onClick.AddListener(() => { audioService.ToggleMute(); RefreshMuteLabel(); });
 
-        bestScoreTMP.text = $"BEST {PlayerPrefs.GetInt("best_score", 0)}";
+        titleScreen.Initialize(audioService, analyticsConsent, TryStartFromTitle);
+        if (replayOnLoad)
+        {
+            replayOnLoad = false;
+            if (!analyticsConsent.IsOpen)
+            {
+                titlePanel.SetActive(false);
+                StartCoroutine(StartRun());
+            }
+        }
     }
 
-    private void Update()
+    private void TryStartFromTitle()
     {
-        if (state != GameState.Title) return;
+        if (state != GameState.Title || startingRun || reloadingScene) return;
         if (analyticsConsent.BlocksStart) return;
-        if(Pointer.current != null && Pointer.current.press.wasPressedThisFrame)
-        {
-            StartRun();
-        }
+        StartCoroutine(StartRun());
     }
 
 }
